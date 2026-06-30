@@ -17,10 +17,27 @@ public class ConfigController {
 
     @GetMapping(value = "/config.js", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<String> getConfigScript() {
-        String apiUrl = env.getProperty("api.url", "http://localhost:8080/api/personas");
+        String apiUrl = normalizeApiUrl(env.getProperty("api.url", "http://localhost:8080/api/personas"));
         String script = "const API_URL = '" + apiUrl.replace("'", "\\'") + "';";
         return ResponseEntity.ok()
                 .contentType(MediaType.parseMediaType("application/javascript"))
                 .body(script);
+    }
+
+    private String normalizeApiUrl(String rawApiUrl) {
+        if (rawApiUrl == null || rawApiUrl.isBlank()) {
+            return "http://localhost:8080/api/personas";
+        }
+
+        String apiUrl = rawApiUrl.trim();
+        if (apiUrl.startsWith("http://") || apiUrl.startsWith("https://") || apiUrl.startsWith("/")) {
+            return apiUrl;
+        }
+
+        if (apiUrl.startsWith("//")) {
+            return "https:" + apiUrl;
+        }
+
+        return "https://" + apiUrl;
     }
 }
