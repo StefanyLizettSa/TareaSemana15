@@ -1,0 +1,714 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Gestión de Personas</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            text-align: center;
+            color: #fff;
+            margin-bottom: 30px;
+            font-size: 2.5rem;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+        h1 span {
+            background: linear-gradient(135deg, #e94560, #ff6b6b);
+            padding: 5px 15px;
+            border-radius: 10px;
+        }
+
+        /* ===== BOTÓN SEEDER ===== */
+        .seeder-section {
+            text-align: center;
+            margin-bottom: 25px;
+        }
+        .btn-seeder {
+            background: linear-gradient(135deg, #f7971e, #ffd200);
+            color: #1a1a2e;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 30px;
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            box-shadow: 0 4px 15px rgba(247, 151, 30, 0.4);
+        }
+        .btn-seeder:hover {
+            transform: scale(1.05);
+            box-shadow: 0 6px 25px rgba(247, 151, 30, 0.6);
+        }
+        .btn-seeder:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        /* ===== APP GRID ===== */
+        .app {
+            display: grid;
+            grid-template-columns: 1fr 2fr;
+            gap: 25px;
+        }
+
+        /* ===== FORMULARIO ===== */
+        .form-section {
+            background: rgba(255,255,255,0.95);
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+            backdrop-filter: blur(10px);
+        }
+
+        .form-section h2 {
+            color: #1a1a2e;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 3px solid #e94560;
+        }
+
+        .form-group {
+            margin-bottom: 14px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 4px;
+            font-weight: 600;
+            color: #333;
+            font-size: 13px;
+        }
+
+        input {
+            width: 100%;
+            padding: 10px 12px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: border-color 0.3s;
+            background: #f9f9f9;
+        }
+        input:focus {
+            outline: none;
+            border-color: #e94560;
+            background: #fff;
+        }
+        input.required {
+            border-color: #ff6b6b;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-top: 10px;
+        }
+
+        button {
+            padding: 10px 24px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 15px;
+            font-weight: 600;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+
+        .btn-save {
+            background: linear-gradient(135deg, #11998e, #38ef7d);
+            color: #fff;
+        }
+        .btn-cancel {
+            background: #6c757d;
+            color: #fff;
+        }
+
+        /* ===== LISTA ===== */
+        .list-section {
+            background: rgba(255,255,255,0.95);
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+            overflow-x: auto;
+        }
+
+        .list-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        .list-header h2 {
+            color: #1a1a2e;
+        }
+        .badge-count {
+            background: #e94560;
+            color: #fff;
+            padding: 4px 14px;
+            border-radius: 20px;
+            font-size: 14px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 14px;
+        }
+
+        th, td {
+            padding: 10px 12px;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+        }
+
+        th {
+            background: #1a1a2e;
+            color: #fff;
+            font-weight: 600;
+            white-space: nowrap;
+        }
+
+        tr:hover {
+            background: #f5f5f5;
+        }
+
+        .actions {
+            display: flex;
+            gap: 5px;
+            flex-wrap: wrap;
+        }
+        .actions button {
+            padding: 4px 12px;
+            font-size: 12px;
+            border-radius: 5px;
+        }
+
+        .btn-edit {
+            background: #17a2b8;
+            color: #fff;
+        }
+        .btn-edit:hover {
+            background: #138496;
+        }
+        .btn-delete {
+            background: #dc3545;
+            color: #fff;
+        }
+        .btn-delete:hover {
+            background: #c82333;
+        }
+
+        /* ===== PAGINACIÓN ===== */
+        .pagination {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+            margin-top: 20px;
+            flex-wrap: wrap;
+        }
+        .pagination button {
+            background: #1a1a2e;
+            color: #fff;
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-size: 14px;
+        }
+        .pagination button:hover:not(:disabled) {
+            background: #e94560;
+        }
+        .pagination button:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+        }
+        .pagination .page-info {
+            font-weight: 600;
+            color: #1a1a2e;
+            background: #f0f0f0;
+            padding: 6px 16px;
+            border-radius: 20px;
+        }
+
+        /* ===== MENSAJES ===== */
+        .message {
+            margin-top: 15px;
+            padding: 12px;
+            border-radius: 8px;
+            display: none;
+            font-weight: 500;
+        }
+        .message.success {
+            display: block;
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .message.error {
+            display: block;
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        .message.info {
+            display: block;
+            background: #cce5ff;
+            color: #004085;
+            border: 1px solid #b8daff;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 30px;
+            color: #1a1a2e;
+            font-size: 18px;
+        }
+
+        .empty-row td {
+            text-align: center;
+            padding: 30px;
+            color: #888;
+            font-style: italic;
+        }
+
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 992px) {
+            .app {
+                grid-template-columns: 1fr;
+            }
+        }
+        @media (max-width: 600px) {
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+            .list-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            .pagination {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+
+    <h1>👤 <span>Gestión de Personas</span></h1>
+
+    <!-- BOTÓN SEEDER -->
+    <div class="seeder-section">
+        <button class="btn-seeder" id="btnSeeder" onclick="ejecutarSeeder()">
+            🌱 Cargar 20 registros demo (Seeder)
+        </button>
+    </div>
+
+    <div class="app">
+
+        <!-- ===== FORMULARIO ===== -->
+        <div class="form-section">
+            <h2 id="formTitle">📝 Registrar Persona</h2>
+            <form id="personaForm" novalidate>
+                <input type="hidden" id="personaId">
+
+                <div class="form-group">
+                    <label>DNI (8 dígitos) *</label>
+                    <input type="text" id="dni" required maxlength="8"
+                           placeholder="Ej: 70123456"
+                           pattern="\d{8}" title="Debe tener 8 dígitos numéricos">
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Apellido Paterno *</label>
+                        <input type="text" id="apepaterno" required placeholder="Ej: Sánchez">
+                    </div>
+                    <div class="form-group">
+                        <label>Apellido Materno</label>
+                        <input type="text" id="apematerno" placeholder="Ej: Pérez">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Nombres *</label>
+                    <input type="text" id="nombres" required placeholder="Ej: Juan Carlos">
+                </div>
+
+                <div class="form-group">
+                    <label>Correo Electrónico *</label>
+                    <input type="email" id="correo" required placeholder="Ej: juan@email.com">
+                </div>
+
+                <div class="btn-group">
+                    <button type="submit" class="btn-save">💾 Guardar</button>
+                    <button type="button" class="btn-cancel" onclick="resetForm()">🗑️ Cancelar</button>
+                </div>
+            </form>
+            <div id="message" class="message"></div>
+        </div>
+
+        <!-- ===== LISTA ===== -->
+        <div class="list-section">
+            <div class="list-header">
+                <h2>📋 Lista de Personas</h2>
+                <span class="badge-count" id="totalCount">0 registros</span>
+            </div>
+
+            <div id="loading" class="loading" style="display:none;">⏳ Cargando...</div>
+
+            <div style="overflow-x:auto;">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>DNI</th>
+                            <th>Apellido Paterno</th>
+                            <th>Apellido Materno</th>
+                            <th>Nombres</th>
+                            <th>Correo</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody id="personasTableBody">
+                        <tr class="empty-row">
+                            <td colspan="7">No hay personas registradas</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- PAGINACIÓN -->
+            <div class="pagination" id="pagination">
+                <button id="prevPage" onclick="cambiarPagina(-1)" disabled>⬅ Anterior</button>
+                <span class="page-info" id="pageInfo">Página 0 de 0</span>
+                <button id="nextPage" onclick="cambiarPagina(1)" disabled>Siguiente ➡</button>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- ===================== JAVASCRIPT ============================ -->
+<!-- ============================================================ -->
+<script>
+    // ===== CONFIGURACIÓN =====
+    const API_URL = 'http://localhost:8080/api/personas';
+    let paginaActual = 0;
+    let totalPaginas = 0;
+    let totalElementos = 0;
+
+    // ===== REFERENCIAS DOM =====
+    const tbody = document.getElementById('personasTableBody');
+    const loading = document.getElementById('loading');
+    const messageDiv = document.getElementById('message');
+
+    // ===== INICIALIZAR =====
+    document.addEventListener('DOMContentLoaded', () => {
+        cargarPersonas(0);
+    });
+
+    // ===== FORMULARIO: ENVÍO =====
+    document.getElementById('personaForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+
+        const id = document.getElementById('personaId').value;
+        const personaData = {
+            dni: document.getElementById('dni').value.trim(),
+            apepaterno: document.getElementById('apepaterno').value.trim(),
+            apematerno: document.getElementById('apematerno').value.trim(),
+            nombres: document.getElementById('nombres').value.trim(),
+            correo: document.getElementById('correo').value.trim()
+        };
+
+        // Validación extra
+        if (!/^\d{8}$/.test(personaData.dni)) {
+            showMessage('⚠️ El DNI debe tener exactamente 8 dígitos numéricos', 'error');
+            return;
+        }
+
+        // Validar que los campos obligatorios no estén vacíos
+        if (!personaData.apepaterno || !personaData.nombres || !personaData.correo) {
+            showMessage('⚠️ Los campos con * son obligatorios', 'error');
+            return;
+        }
+
+        try {
+            if (id) {
+                await actualizarPersona(id, personaData);
+            } else {
+                await crearPersona(personaData);
+            }
+        } catch (error) {
+            showMessage('❌ ' + error.message, 'error');
+        }
+    });
+
+    // ===== FUNCIONES API =====
+
+    // Cargar personas con paginación
+    async function cargarPersonas(page) {
+        loading.style.display = 'block';
+        tbody.innerHTML = '';
+
+        try {
+            const response = await fetch(`${API_URL}?page=${page}`);
+            if (!response.ok) throw new Error('Error al cargar datos');
+
+            const data = await response.json();
+
+            // Actualizar variables de paginación
+            paginaActual = data.number;
+            totalPaginas = data.totalPages;
+            totalElementos = data.totalElements;
+
+            // Actualizar contador
+            document.getElementById('totalCount').textContent = `${totalElementos} registros`;
+
+            // Renderizar tabla
+            if (data.content && data.content.length > 0) {
+                renderizarTabla(data.content);
+            } else {
+                tbody.innerHTML = `<tr class="empty-row"><td colspan="7">No hay personas registradas</td></tr>`;
+            }
+
+            // Actualizar paginación
+            actualizarPaginacion();
+
+        } catch (error) {
+            showMessage('❌ Error al cargar personas: ' + error.message, 'error');
+            tbody.innerHTML = `<tr class="empty-row"><td colspan="7">Error al cargar datos</td></tr>`;
+        } finally {
+            loading.style.display = 'none';
+        }
+    }
+
+    // Renderizar tabla
+    function renderizarTabla(personas) {
+        tbody.innerHTML = personas.map(p => `
+            <tr>
+                <td><strong>${p.id}</strong></td>
+                <td>${escapaHtml(p.dni)}</td>
+                <td>${escapaHtml(p.apepaterno)}</td>
+                <td>${escapaHtml(p.apematerno || '')}</td>
+                <td><strong>${escapaHtml(p.nombres)}</strong></td>
+                <td>${escapaHtml(p.correo)}</td>
+                <td>
+                    <div class="actions">
+                        <button class="btn-edit" onclick="editarPersona(${p.id})">✏️</button>
+                        <button class="btn-delete" onclick="eliminarPersona(${p.id})">🗑️</button>
+                    </div>
+                </td>
+            </tr>
+        `).join('');
+    }
+
+    // Crear persona
+    async function crearPersona(data) {
+        const response = await fetch(API_URL, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(data)
+        });
+
+        if (!response.ok) {
+            const error = await response.text();
+            let mensaje = error;
+            try {
+                const json = JSON.parse(error);
+                mensaje = json.message || json.errores || error;
+            } catch (e) {}
+            throw new Error(mensaje);
+        }
+
+        showMessage('✅ Persona creada exitosamente', 'success');
+        resetForm();
+        await cargarPersonas(paginaActual);
+    }
+
+    // Actualizar persona
+    async function actualizarPersona(id, data) {
+        const response = await fetch(`${API_URL}/${id}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(data)
+        });
+
+        if (!response.ok) {
+            const error = await response.text();
+            let mensaje = error;
+            try {
+                const json = JSON.parse(error);
+                mensaje = json.message || json.errores || error;
+            } catch (e) {}
+            throw new Error(mensaje);
+        }
+
+        showMessage('✅ Persona actualizada exitosamente', 'success');
+        resetForm();
+        await cargarPersonas(paginaActual);
+    }
+
+    // Editar persona (cargar en formulario)
+    async function editarPersona(id) {
+        try {
+            const response = await fetch(`${API_URL}/${id}`);
+            if (!response.ok) throw new Error('Persona no encontrada');
+
+            const p = await response.json();
+
+            document.getElementById('personaId').value = p.id;
+            document.getElementById('dni').value = p.dni || '';
+            document.getElementById('apepaterno').value = p.apepaterno || '';
+            document.getElementById('apematerno').value = p.apematerno || '';
+            document.getElementById('nombres').value = p.nombres || '';
+            document.getElementById('correo').value = p.correo || '';
+
+            document.getElementById('formTitle').textContent = '✏️ Editando Persona ID: ' + p.id;
+            document.querySelector('.form-section').scrollIntoView({ behavior: 'smooth' });
+
+        } catch (error) {
+            showMessage('❌ Error al cargar persona: ' + error.message, 'error');
+        }
+    }
+
+    // Eliminar persona
+    async function eliminarPersona(id) {
+        if (!confirm('¿Estás seguro de eliminar esta persona?')) return;
+
+        try {
+            const response = await fetch(`${API_URL}/${id}`, {
+                method: 'DELETE'
+            });
+
+            if (!response.ok) {
+                const error = await response.text();
+                throw new Error(error || 'Error al eliminar');
+            }
+
+            showMessage('✅ Persona eliminada exitosamente', 'success');
+
+            // Si la persona editada era la eliminada, resetear formulario
+            if (document.getElementById('personaId').value == id) {
+                resetForm();
+            }
+
+            await cargarPersonas(paginaActual);
+
+        } catch (error) {
+            showMessage('❌ Error al eliminar: ' + error.message, 'error');
+        }
+    }
+
+    // ===== SEEDER =====
+    async function ejecutarSeeder() {
+        const btn = document.getElementById('btnSeeder');
+        btn.disabled = true;
+        btn.textContent = '⏳ Ejecutando...';
+
+        try {
+            const response = await fetch(`${API_URL}/seed`, {
+                method: 'POST'
+            });
+
+            if (!response.ok) throw new Error('Error al ejecutar seeder');
+
+            const texto = await response.text();
+            showMessage('✅ ' + texto, 'success');
+
+            // Recargar la página actual
+            await cargarPersonas(0);
+
+        } catch (error) {
+            showMessage('❌ Error en seeder: ' + error.message, 'error');
+        } finally {
+            btn.disabled = false;
+            btn.textContent = '🌱 Cargar 20 registros demo (Seeder)';
+        }
+    }
+
+    // ===== PAGINACIÓN =====
+    function cambiarPagina(delta) {
+        const nuevaPagina = paginaActual + delta;
+        if (nuevaPagina >= 0 && nuevaPagina < totalPaginas) {
+            cargarPersonas(nuevaPagina);
+        }
+    }
+
+    function actualizarPaginacion() {
+        document.getElementById('pageInfo').textContent =
+            `Página ${paginaActual + 1} de ${totalPaginas || 1}`;
+
+        document.getElementById('prevPage').disabled = (paginaActual === 0);
+        document.getElementById('nextPage').disabled = (paginaActual >= totalPaginas - 1);
+    }
+
+    // ===== UTILIDADES =====
+
+    function resetForm() {
+        document.getElementById('personaForm').reset();
+        document.getElementById('personaId').value = '';
+        document.getElementById('formTitle').textContent = '📝 Registrar Persona';
+    }
+
+    function showMessage(msg, type) {
+        messageDiv.textContent = msg;
+        messageDiv.className = `message ${type}`;
+        messageDiv.style.display = 'block';
+
+        clearTimeout(messageDiv._timeout);
+        messageDiv._timeout = setTimeout(() => {
+            messageDiv.style.display = 'none';
+        }, 5000);
+    }
+
+    function escapaHtml(text) {
+        if (!text) return '';
+        const div = document.createElement('div');
+        div.textContent = text;
+        return div.innerHTML;
+    }
+
+    // ===== TECLADO: Enter para enviar =====
+    document.querySelectorAll('input').forEach(input => {
+        input.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                document.getElementById('personaForm').requestSubmit();
+            }
+        });
+    });
+</script>
+</body>
+</html>
